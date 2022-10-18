@@ -76,7 +76,7 @@ namespace atomic {
 
 template <typename type_t>
 __host__ __device__ __forceinline__ type_t add(type_t* address, type_t value) {
-#ifdef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__
   return atomicAdd(address, value);
 #else
   // use std::atomic::fetch_add();
