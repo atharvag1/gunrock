@@ -10,13 +10,13 @@
 Before building Gunrock make sure you have **CUDA Toolkit**[^2] installed on your system. Other external dependencies such as `NVIDIA/thrust`, `NVIDIA/cub`, etc. are automatically fetched using `cmake`.
 
 ```shell
-git clone https://github.com/gunrock/gunrock.git
-git checkout hip
+git clone https://github.com/AMD-HPC/gunrock
 cd gunrock
+git checkout hip
 mkdir build && cd build
 cmake .. 
-make sssp # or for all algorithms, use: make -j$(nproc)
-bin/sssp ../datasets/chesapeake/chesapeake.mtx
+make bfs # or for all algorithms, use: make -j$(nproc)
+bin/bfs ../datasets/chesapeake/chesapeake.mtx
 ```
 
 ## Implementing Graph Algorithms
