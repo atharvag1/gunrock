@@ -41,12 +41,21 @@ struct dimensions_t {
   __host__ __device__ constexpr unsigned int size() const { return x * y * z; }
 
 #ifdef _MSC_VER
-  __host__ __device__ operator dim3(void) const { return uint3{x, y, z}; }
+  __host__ __device__ operator dim3(void) const { 
+  return uint3{x, y, z}; }
 #else
   __host__ __device__ constexpr operator dim3(void) const {
-    return uint3{x, y, z};
+	//no viable conversion from returned value of type 'uint3' 'uint3' (aka 'HIP_vector_type<unsigned int, 3>') to function return type 'dim3'	
+    //return uint3{x, y, z};
+	dim3 dims;
+	dims.x=x;
+	dims.y=y;
+	dims.z=z;
+	return dims;
+
   }
 #endif
+
 };
 
 /**
@@ -133,7 +142,8 @@ struct launch_params_dynamic_grid_t
   }
 
   void calculate_grid_dimensions_blocked(std::size_t num_elements) {
-    grid_dimensions = dimensions_t(
+	
+	grid_dimensions = dimensions_t(
         (num_elements + (block_dimensions.x * base_t::items_per_thread) - 1) /
             (block_dimensions.x * base_t::items_per_thread),
         1, 1);
@@ -299,7 +309,7 @@ struct launch_box_t : public select_launch_params_t<lp_v...> {
     void* argument_ptrs[non_zero_num_params];
     detail::for_each_argument_address(argument_ptrs,
                                       ::std::forward<args_t>(args)...);
-    cudaLaunchCooperativeKernel<func_t>(
+    hipLaunchCooperativeKernel<func_t>(
         &f, params_t::grid_dimensions, params_t::block_dimensions,
         argument_ptrs, params_t::shared_memory_bytes, context.stream());
   }
@@ -330,7 +340,7 @@ struct launch_box_t : public select_launch_params_t<lp_v...> {
               args_t&&... args) {
     f<<<params_t::grid_dimensions, params_t::block_dimensions,
         params_t::shared_memory_bytes, context.stream()>>>(
-        std::forward<args_t>(args)...);
+        std::forward<args_t>(args)...); 
   }
 };  // struct launch_box_t
 
@@ -347,11 +357,11 @@ inline float occupancy(func_t kernel) {
   int max_active_blocks;
   int block_size = launch_box_t::block_dimensions_t::size();
   int device;
-  cudaDeviceProp props;
+  hipDeviceProp_t props;
 
-  cudaGetDevice(&device);
-  cudaGetDeviceProperties(&props, device);
-  error::error_t status = cudaOccupancyMaxActiveBlocksPerMultiprocessor(
+  hipGetDevice(&device);
+  hipGetDeviceProperties(&props, device);
+  error::error_t status = hipOccupancyMaxActiveBlocksPerMultiprocessor(
       &max_active_blocks, kernel, block_size, (size_t)0);
   error::throw_if_exception(status);
   float occupancy = (max_active_blocks * block_size / props.warpSize) /

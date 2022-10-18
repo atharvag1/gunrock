@@ -55,6 +55,8 @@ struct problem_t : gunrock::problem_t<graph_t> {
     auto d_distances = thrust::device_pointer_cast(this->result.distances);
     thrust::fill(thrust::device, d_distances + 0, d_distances + n_vertices,
                  std::numeric_limits<vertex_t>::max());
+				 
+	//std::cout << "max limit is "<< std::numeric_limits<vertex_t>::max() << std::endl;
     thrust::fill(thrust::device, d_distances + this->param.single_source,
                  d_distances + this->param.single_source + 1, 0);
   }
@@ -108,9 +110,11 @@ struct enactor_t : gunrock::enactor_t<problem_t> {
       //               std::numeric_limits<vertex_t>::max());
 
       // Simpler logic for the above.
-      auto old_distance =
-          math::atomic::min(&distances[neighbor], iteration + 1);
-      return (iteration + 1 < old_distance);
+	  //printf (" executing op\n");
+	  
+	  auto old_distance=math::atomic::min(&distances[neighbor], iteration + 1);  
+	  
+     return (iteration + 1 < old_distance);
     };
 
     auto remove_invalids =

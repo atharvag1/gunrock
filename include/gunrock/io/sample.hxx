@@ -1,4 +1,5 @@
-/**
+/*
+ *
  * @file sample.hxx
  * @author Muhammad Osama (mosama@ucdavis.edu)
  * @brief

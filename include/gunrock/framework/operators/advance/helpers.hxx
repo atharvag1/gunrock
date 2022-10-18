@@ -65,8 +65,9 @@ std::size_t compute_output_offsets(graph_t& G,
   };
 
   auto new_length = thrust::transform_exclusive_scan(
-      thrust::cuda::par.on(context.stream()),          // execution policy
-      thrust::make_counting_iterator<std::size_t>(0),  // input iterator: first
+      //thrust::cuda::par.on(context.stream()),          // execution policy
+      thrust::hip::par.on(context.stream()),
+	  thrust::make_counting_iterator<std::size_t>(0),  // input iterator: first
       thrust::make_counting_iterator<std::size_t>(total_elems +
                                                   1),  // input iterator: last
       segments.begin(),                                // output iterator
@@ -133,8 +134,9 @@ std::size_t compute_output_length(graph_t& G,
   };
 
   auto new_length = thrust::transform_reduce(
-      thrust::cuda::par.on(context.stream()),          // execution policy
-      thrust::make_counting_iterator<std::size_t>(0),  // input iterator: first
+      //thrust::cuda::par.on(context.stream()),          // execution policy
+      thrust::hip::par.on(context.stream()),
+	  thrust::make_counting_iterator<std::size_t>(0),  // input iterator: first
       thrust::make_counting_iterator<std::size_t>(
           total_elems),       // input iterator: last
       segment_sizes,          // unary operation

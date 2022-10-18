@@ -1,3 +1,5 @@
+
+
 /**
  * @file block_mapped.hxx
  * @author Muhammad Osama (mosama@ucdavis.edu)
@@ -10,7 +12,7 @@
  */
 
 #pragma once
-
+#include "hip/hip_runtime.h"
 #include <gunrock/util/math.hxx>
 #include <gunrock/cuda/cuda.hxx>
 
@@ -19,8 +21,8 @@
 #include <thrust/transform_scan.h>
 #include <thrust/iterator/discard_iterator.h>
 
-#include <cub/block/block_load.cuh>
-#include <cub/block/block_scan.cuh>
+#include <hipcub/block/block_load.hpp>
+#include <hipcub/block/block_scan.hpp>
 
 namespace gunrock {
 namespace operators {
@@ -49,7 +51,7 @@ __global__ void __launch_bounds__(THREADS_PER_BLOCK, 2)
   using type_t = frontier_t;
 
   // Specialize Block Scan for 1D block of THREADS_PER_BLOCK.
-  using block_scan_t = cub::BlockScan<edge_t, THREADS_PER_BLOCK>;
+  using block_scan_t = hipcub::BlockScan<edge_t, THREADS_PER_BLOCK>;
 
   auto global_idx = gcuda::thread::global::id::x();
   auto local_idx = gcuda::thread::local::id::x();
@@ -97,13 +99,14 @@ __global__ void __launch_bounds__(THREADS_PER_BLOCK, 2)
     // All writes from this block will be after this offset. Note: this does not
     // guarantee that the data written will be in any specific order.
     if (local_idx == 0)
+	{
       offset[0] = math::atomic::add(
           &block_offsets[0], (offset_counter_t)aggregate_degree_per_block);
+	}
   }
   __syncthreads();
 
   auto length = global_idx - local_idx + gcuda::block::size::x();
-
   if (input_size < length)
     length = input_size;
 
@@ -119,14 +122,15 @@ __global__ void __launch_bounds__(THREADS_PER_BLOCK, 2)
   ) {
     // Binary search to find which vertex id to work on.
     int id = search::binary::rightmost(degrees, i, length);
-
     // If the id is greater than the width of the block or the input size, we
     // exit.
+	
     if (id >= length)
       continue;
 
     // Fetch the vertex corresponding to the id.
     vertex_t v = vertices[id];
+	
     if (!gunrock::util::limits::is_valid(v))
       continue;
 
@@ -134,14 +138,13 @@ __global__ void __launch_bounds__(THREADS_PER_BLOCK, 2)
     auto e = sedges[id] + i - degrees[id];
     auto n = G.get_destination_vertex(e);
     auto w = G.get_edge_weight(e);
-
-    // Use-defined advance condition.
+   // Use-defined advance condition.
     bool cond = op(v, n, e, w);
-
     // Store [neighbor] into the output frontier.
     if constexpr (output_type != advance_io_type_t::none) {
       output[offset[0] + i] =
           cond ? n : gunrock::numeric_limits<vertex_t>::invalid();
+		 
     }
   }
 }
@@ -171,12 +174,13 @@ void execute(graph_t& G,
     if (output.get_capacity() < size_of_output)
       output.reserve(size_of_output);
     output.set_number_of_elements(size_of_output);
+	
   }
 
   std::size_t num_elements = (input_type == advance_io_type_t::graph)
                                  ? G.get_number_of_vertices()
                                  : input.get_number_of_elements();
-
+   
   // Set-up and launch block-mapped advance.
   using namespace gcuda::launch_box;
   using launch_t =
@@ -201,6 +205,7 @@ void execute(graph_t& G,
   launch_box.calculate_grid_dimensions_strided(num_elements);
   launch_box.launch(context, kernel, G, op, input.data(), output.data(),
                     num_elements, block_offsets.data().get());
+  
   context.synchronize();
 }
 

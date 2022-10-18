@@ -172,4 +172,4 @@ struct smtx_t {
 };
 
 }  // namespace io
-}  // namespace gunrock
+}  // namespace gunrock/**

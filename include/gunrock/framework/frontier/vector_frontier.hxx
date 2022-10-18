@@ -63,7 +63,7 @@ class vector_frontier_t {
 
   // Copy Constructor
   __device__ __host__ vector_frontier_t(const vector_frontier_t& rhs) {
-#ifdef __CUDA_ARCH__
+#if __HIP_DEVICE_COMPILE__
     raw_ptr = rhs.raw_ptr;
 #else
     p_storage = rhs.p_storage;
@@ -174,7 +174,7 @@ class vector_frontier_t {
    * @param stream
    */
   void fill(type_t const value, gcuda::stream_t stream = 0) {
-    thrust::fill(thrust::cuda::par.on(stream), this->begin(), this->end(),
+    thrust::fill(thrust::hip::par.on(stream), this->begin(), this->end(),
                  value);
   }
 
@@ -198,7 +198,7 @@ class vector_frontier_t {
     // Set the new number of elements.
     this->set_number_of_elements(size);
 
-    thrust::sequence(thrust::cuda::par.on(stream), this->begin(), this->end(),
+    thrust::sequence(thrust::hip::par.on(stream), this->begin(), this->end(),
                      initial_value);
   }
 
