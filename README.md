@@ -11,6 +11,7 @@ Before building Gunrock make sure you have **CUDA Toolkit**[^2] installed on you
 
 ```shell
 git clone https://github.com/gunrock/gunrock.git
+git checkout hip
 cd gunrock
 mkdir build && cd build
 cmake .. 
