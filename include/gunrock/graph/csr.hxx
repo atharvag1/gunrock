@@ -107,6 +107,15 @@ class graph_csr_t {
    * @param on_intersection Lambda function executed at each intersection
    * @return Number of shared vertices between source and destination
    */
+   
+      template <class input_type>
+   __host__ __device__ __forceinline__ void swap_values(input_type& source, input_type& destination) const{
+	   input_type temp;
+	   temp = source;
+	   source = destination;
+	   destination = temp;
+   }
+   
   template <typename operator_type>
   __host__ __device__ __forceinline__ vertex_type
   get_intersection_count(const vertex_type& source,
@@ -124,8 +133,10 @@ class graph_csr_t {
       return 0;
     }
     if (source_neighbors_count > destination_neighbors_count) {
-      std::swap(intersection_source, intersection_destination);
-      std::swap(source_neighbors_count, destination_neighbors_count);
+      //std::swap(intersection_source, intersection_destination);
+      //std::swap(source_neighbors_count, destination_neighbors_count);
+	  swap_values(intersection_source, intersection_destination);
+	  swap_values(source_neighbors_count, destination_neighbors_count);
     }
 
     auto source_offset = offsets[intersection_source];
