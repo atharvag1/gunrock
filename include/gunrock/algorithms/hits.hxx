@@ -186,21 +186,21 @@ struct problem_t : gunrock::problem_t<graph_t> {
 
   // Swap the auth_curr <-> auth_next
   // and hub_curr <-> hub_next
-  __device__ void swap_buffer() {
+   void swap_buffer() {
     thrust::swap(auth_curr, auth_next);
     thrust::swap(hub_curr, hub_next);
   }
 
-  __device__ void update_auth(int dest_pos, int source_pos) {
+   __host__ __device__ void update_auth(int dest_pos, int source_pos) {
     gunrock::math::atomic::add(&this->auth_next_p[dest_pos],
                                hub_curr_p[source_pos]);
   }
 
-  __device__ void update_hub(int dest_pos, int source_pos) {
+   __host__ __device__ void update_hub(int dest_pos, int source_pos) {
     gunrock::math::atomic::add(&hub_next_p[dest_pos], auth_curr_p[source_pos]);
   }
 
-  __device__ void norm_auth() {
+   void norm_auth() {
     auto policy = this->get_single_context(0)->execution_policy();
 
     thrust::for_each(policy, this->auth_next.begin(), this->auth_next.end(),
@@ -213,7 +213,7 @@ struct problem_t : gunrock::problem_t<graph_t> {
                      op);
   }
 
-  __device__ void norm_hub() {
+   void norm_hub() {
     auto policy = this->get_single_context(0)->execution_policy();
 
     thrust::for_each(policy, this->hub_next.begin(), this->hub_next.end(),

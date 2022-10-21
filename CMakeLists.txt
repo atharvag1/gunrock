@@ -178,8 +178,8 @@ set(HIP_FLAGS
   #--generate-line-info
   
   $<$<CXX_COMPILER_ID:GNU>:-O3> # Host optimize-level
-  # --verbose
-  # --debug # Host debug
+   --verbose
+   --debug # Host debug
   # --device-debug # Device debug
 )
 
