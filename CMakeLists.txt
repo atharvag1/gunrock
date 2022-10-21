@@ -185,7 +185,7 @@ set(HIP_FLAGS
 
 set(CMAKE_HIP_FLAGS_DEBUG "--optimize 0 --debug --device-debug -g -G")
 set(CMAKE_HIP_FLAGS_RELEASE "--optimize 3")
-
+SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
 ####################################################
 ############ TARGET COMPILE OPTIONS ################
 ####################################################
