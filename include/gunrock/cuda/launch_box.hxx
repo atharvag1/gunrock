@@ -47,12 +47,7 @@ struct dimensions_t {
   __host__ __device__ constexpr operator dim3(void) const {
 	//no viable conversion from returned value of type 'uint3' 'uint3' (aka 'HIP_vector_type<unsigned int, 3>') to function return type 'dim3'	
     //return uint3{x, y, z};
-	dim3 dims;
-	dims.x=x;
-	dims.y=y;
-	dims.z=z;
-	return dims;
-
+       return dim3{x, y, z};
   }
 #endif
 
