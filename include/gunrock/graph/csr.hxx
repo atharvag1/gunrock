@@ -133,10 +133,10 @@ class graph_csr_t {
       return 0;
     }
     if (source_neighbors_count > destination_neighbors_count) {
-      //std::swap(intersection_source, intersection_destination);
-      //std::swap(source_neighbors_count, destination_neighbors_count);
-	  swap_values(intersection_source, intersection_destination);
-	  swap_values(source_neighbors_count, destination_neighbors_count);
+      thrust::swap(intersection_source, intersection_destination);
+      thrust::swap(source_neighbors_count, destination_neighbors_count);
+      //swap_values(intersection_source, intersection_destination);
+      //swap_values(source_neighbors_count, destination_neighbors_count);
     }
 
     auto source_offset = offsets[intersection_source];
