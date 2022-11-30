@@ -129,6 +129,8 @@ target_include_directories(essentials
   #INTERFACE ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}
 )
 
+
+find_package(Threads)
 ####################################################
 ############ TARGET LINK LIBRARIES #################
 ####################################################
@@ -136,6 +138,7 @@ target_link_libraries(essentials
   INTERFACE hiprand
   INTERFACE hip
   INTERFACE hipsparse
+  ${CMAKE_THREAD_LIBS_INIT}
 )
 
 ####################################################
@@ -185,7 +188,7 @@ set(HIP_FLAGS
 
 set(CMAKE_HIP_FLAGS_DEBUG "--optimize 0 --debug --device-debug -g -G")
 set(CMAKE_HIP_FLAGS_RELEASE "--optimize 3")
-SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
+#SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
 ####################################################
 ############ TARGET COMPILE OPTIONS ################
 ####################################################
